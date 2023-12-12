@@ -20,6 +20,7 @@ dropdown_options_platform = [{'label' : publisher, 'value' : publisher} for publ
 # -----------------------------------------------------------------------------------------------------
 # checking values
 print(df.head())
+
 print(unique_genres)
 print(unique_platform)
 
@@ -53,7 +54,28 @@ app.layout = html.Div([
 
     dcc.Graph(
             id = 'testGraph',
-            style = {'width':'50%'},
+            style = {'width':'40%'},
+            figure = {}
+    ),
+
+    # dcc.Dropdown(
+    #             id = 'selectGenreForGlobalSalesInDifferentYears',
+    #             options = dropdown_options_genres,
+    #             value = "PC",
+    #             multi = False,
+    #             style = {'width' : '40%'}
+    # ),
+
+    dcc.Input(
+                id = 'ForPieChartOfGenreDistInDifferentYears',
+                placeholder='Enter the year',
+                type='text',
+                value='2013'
+    ),
+
+    dcc.Graph(
+            id = 'PieChartOfGenreDistInDifferentYears',
+            style = {'width':'40%'},
             figure = {}
     )
 ])
@@ -62,12 +84,15 @@ app.layout = html.Div([
 # Connect the Plotly graphs with Dash Components.
 @app.callback(
     [Output(component_id='testGraph', component_property='figure'),
-    Output(component_id='container', component_property='children')],
+    Output(component_id='container', component_property='children'),
+    Output(component_id='PieChartOfGenreDistInDifferentYears', component_property='figure')],
+
     [Input(component_id = 'selectGenre', component_property='value'),
-     Input(component_id= 'selectPlatform', component_property='value')]
+     Input(component_id= 'selectPlatform', component_property='value'),
+     Input(component_id= 'ForPieChartOfGenreDistInDifferentYears', component_property= 'value')]
 )
 
-def updateGraph(genre_selected, platform_selected): # #of args = #of inputs in the callback & arg always refers to the component_property
+def updateGraph(genre_selected, platform_selected, yearForGenreDist): # #of args = #of inputs in the callback & arg always refers to the component_property
     print(genre_selected)
     print(type(genre_selected))
 
@@ -78,8 +103,14 @@ def updateGraph(genre_selected, platform_selected): # #of args = #of inputs in t
 
     # Making a copy of df so that any changes we make here in the function won't be affected to the original df
     dff = df.copy()
+    dff2 = df.copy()
+
+    # Graph 1
     dff = dff[dff["Genre"] == genre_selected]
     dff = dff[dff["Platform"] == platform_selected]
+
+    # Graph 2 --pie chart in genre distributions in different years
+    dff2 = dff2[dff2["Year"] == yearForGenreDist]
 
     #Checking
     print(dff.head())
@@ -91,8 +122,10 @@ def updateGraph(genre_selected, platform_selected): # #of args = #of inputs in t
         y = "Global_Sales"
     )
 
+    fig2 = px.pie(dff2, names='')
+
     # order of returned values is wrt to the order of [Output]s in the callback
-    return fig, container
+    return fig, container, fig2
 
 if __name__ == '__main__':
     app.run(debug=True)
