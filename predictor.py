@@ -3,12 +3,12 @@ import pandas as pd
 df_prediction = pd.read_csv("VideoGamesSales.csv")
 df_prediction.info()
 
-# Drop rows with null values in specific columns
-# columns_to_check = ['Genre', 'Platform', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
-# df = df.dropna(subset=columns_to_check)
-
 df_prediction = df_prediction[df_prediction["Genre"].isin(["Action", "Role-Playing"])] # this won't work: # df_prediction = df_prediction[df_prediction["Genre"] == ("Action" or "Role-Playing")]
 df_prediction.info()
+
+#Drop rows with null values in specific columns
+columns_to_check = ['Genre', 'Platform', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+df_prediction = df_prediction.dropna(subset=columns_to_check)
 
 # Encode categorical variables
 from sklearn.preprocessing import LabelEncoder
@@ -18,9 +18,11 @@ df_prediction['Platform'] = label_encoder.fit_transform(df_prediction['Platform'
 df_prediction['Genre'] = label_encoder.fit_transform(df_prediction['Genre'])
 
 # Split dataset into features and target variable
-features = ['Publisher', 'Genre', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+features = ['Publisher', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
 X = df_prediction[features]
 y = df_prediction['Genre']
+
+print(f"Number of samples in X: {len(X)}, Number of samples in y: {len(y)}")
 
 # Split data into training and testing sets
 from sklearn.model_selection import train_test_split

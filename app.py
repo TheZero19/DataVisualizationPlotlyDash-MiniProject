@@ -69,7 +69,7 @@ app.layout = html.Div([
     dcc.Dropdown(
                 id = 'SelectedCategoricalValuesToPredict',
                 options = unique_genres,
-                value = 'Action',
+                value = ['Action', 'Role-Playing'], # THANK YOU FOR WASTING 2.5 HOURS
                 multi=True,
     ),
 
@@ -77,8 +77,10 @@ app.layout = html.Div([
         id = 'container2',
         children=[]
     ),
+
 ])
 
+# Callbacks Section:
 from callbacks import *
 
 if __name__ == '__main__':

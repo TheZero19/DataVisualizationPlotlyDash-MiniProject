@@ -15,11 +15,11 @@ from app import app
 )
 
 def updateGraph(genre_selected, platform_selected, yearForGenreDist): # #of args = #of inputs in the callback & arg always refers to the component_property
-    print(genre_selected)
-    print(type(genre_selected))
-
-    print(platform_selected)
-    print(type(platform_selected))
+    # print(genre_selected)
+    # print(type(genre_selected))
+    #
+    # print(platform_selected)
+    # print(type(platform_selected))
 
     container = "The genre chosen by the user was {} for {}".format(genre_selected, platform_selected)
 
@@ -35,9 +35,6 @@ def updateGraph(genre_selected, platform_selected, yearForGenreDist): # #of args
     dff2 = dff2[dff2["Year"] == yearForGenreDist]
     genre_counts = dff2['Genre'].value_counts().reset_index() # Calculate the number of games per genre for the selected year
     genre_counts.columns = ['Genre', 'Count']
-
-    #Checking
-    print(dff.head())
 
     # Plotly Express
     fig = px.scatter(
@@ -61,3 +58,79 @@ def update_dropdown_selectCategoricalAttributeToPredict_options(selected_option)
         return unique_genres
     elif selected_option == 'Platform':
         return unique_platforms
+
+@app.callback(
+    Output(component_id='container2', component_property='children'),
+    [Input(component_id='selectCategoricalAttributeToPredict', component_property='value'),
+     Input(component_id='SelectedCategoricalValuesToPredict', component_property='value')]
+)
+def updatePredictionOfDecisionTreeClassifier(selected_category, selected_categorical_values):
+    df_prediction = pd.read_csv("VideoGamesSales.csv")
+
+    if selected_category == 'Platform':
+        df_prediction = df_prediction[df_prediction["Platform"].isin(selected_categorical_values)]
+        # df_prediction.info()
+        print("Platform Selected")
+
+        # Drop rows with null values in specific columns
+        columns_to_check = ['Genre', 'Platform', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+        df_prediction = df_prediction.dropna(subset=columns_to_check)
+
+        # Encode categorical variables
+        from sklearn.preprocessing import LabelEncoder
+        label_encoder = LabelEncoder()
+        df_prediction['Publisher'] = label_encoder.fit_transform(df_prediction['Publisher'])
+        df_prediction['Platform'] = label_encoder.fit_transform(df_prediction['Platform'])
+        df_prediction['Genre'] = label_encoder.fit_transform(df_prediction['Genre'])
+
+        # Split dataset into features and target variable
+        features = ['Publisher', 'Genre', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+        X = df_prediction[features]
+        y = df_prediction['Platform']
+
+    else:
+        # if selected_category == 'Genre':
+        df_prediction = df_prediction[df_prediction["Genre"].isin(selected_categorical_values)]
+
+        print("Genre Selected")
+
+        # Drop rows with null values in specific columns
+        columns_to_check = ['Genre', 'Platform', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+        df_prediction = df_prediction.dropna(subset=columns_to_check)
+
+        # Encode categorical variables
+        from sklearn.preprocessing import LabelEncoder
+        label_encoder = LabelEncoder()
+        df_prediction['Publisher'] = label_encoder.fit_transform(df_prediction['Publisher'])
+        df_prediction['Platform'] = label_encoder.fit_transform(df_prediction['Platform'])
+        df_prediction['Genre'] = label_encoder.fit_transform(df_prediction['Genre'])
+
+        # Split dataset into features and target variable
+        features = ['Publisher', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+        X = df_prediction[features]
+        y = df_prediction['Genre']
+
+
+    print(f"Number of samples in X: {len(X)}, Number of samples in y: {len(y)}")
+
+    # Split data into training and testing sets
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)  # , random_state=42
+
+    # Initialize Decision Tree Classifier
+    from sklearn.tree import DecisionTreeClassifier
+    model = DecisionTreeClassifier()  # random_state=42
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Predictions
+    predictions = model.predict(X_test)
+
+    # Evaluation
+    from sklearn.metrics import classification_report
+    print(classification_report(y_test, predictions))
+    from sklearn.metrics import accuracy_score
+    print(accuracy_score(y_test, predictions))
+
+    return "Accuracy: {}".format(accuracy_score(y_test, predictions))

@@ -22,7 +22,6 @@ dropdown_options_years = [{'label': year, 'value': year} for year in unique_year
 
 # -----------------------------------------------------------------------------------------------------
 # checking values
-print(df.head())
-print(unique_genres)
-print(unique_platforms)
-
+# print(df.head())
+# print(unique_genres)
+# print(unique_platforms)
