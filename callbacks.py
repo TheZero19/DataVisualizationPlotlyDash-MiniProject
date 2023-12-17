@@ -133,16 +133,24 @@ def updatePredictionOfDecisionTreeClassifier(selected_category, selected_categor
     from sklearn.tree import DecisionTreeClassifier
     model = DecisionTreeClassifier()  # random_state=42
 
+    # Initialize Another Classifiers:
+    from sklearn.ensemble import RandomForestClassifier
+    model2 = RandomForestClassifier()
+
     # Train the model
     model.fit(X_train, y_train)
+    model2.fit(X_train, y_train)
 
     # Predictions
     predictions = model.predict(X_test)
+    predictions2 = model2.predict(X_test)
 
     # Evaluation
     from sklearn.metrics import classification_report
     print(classification_report(y_test, predictions))
+    print(classification_report(y_test, predictions2))
     from sklearn.metrics import accuracy_score
     print(accuracy_score(y_test, predictions))
+    print(accuracy_score(y_test, predictions2))
 
-    return "Accuracy: {}".format(accuracy_score(y_test, predictions))
+    return "Decision Tree Classifier Accuracy: {}, Random Forest Classifier Accuracy: {}".format(accuracy_score(y_test, predictions), accuracy_score(y_test, predictions2))
