@@ -50,6 +50,18 @@ def updateGraph(genre_selected, platform_selected, yearForGenreDist): # #of args
 
 
 @app.callback(
+    Output(component_id='GraphForBarChartOfTotalSalesBasedOnGenre', component_property='figure'),
+    [Input(component_id='YearForBarChartOfTotalSalesOnUniqueGenre', component_property='value')]
+)
+def updateBarChartOfTotalSalesBasedOnGenreOverTheYears(selected_year):
+    dff = pd.read_csv("VideoGamesSales.csv")
+    dff = dff[dff["Year"] == selected_year]
+    genre_sales = dff.groupby('Genre')['Global_Sales'].sum().reset_index()
+    fig = px.bar(genre_sales, x='Genre', y='Global_Sales', labels={'Global_Sales': 'Total Sales'},
+                 title=f'Total Sales by Genre in {selected_year}')
+    return fig
+
+@app.callback(
     Output(component_id='SelectedCategoricalValuesToPredict', component_property='options'),
     [Input(component_id='selectCategoricalAttributeToPredict', component_property='value')]
 )

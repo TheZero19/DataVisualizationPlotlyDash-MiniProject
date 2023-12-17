@@ -37,7 +37,21 @@ app.layout = html.Div([
             figure = {}
     ),
 
-    html.H2("Select the year for viewing genre distributions in different years"),
+    html.H2("Select the year for viewing the sales based on genre"),
+    dcc.Dropdown(
+            id = 'YearForBarChartOfTotalSalesOnUniqueGenre',
+            options=dropdown_options_years,
+            value = 2013,
+            style={'width':'40%'}
+    ),
+
+    dcc.Graph(
+            id = 'GraphForBarChartOfTotalSalesBasedOnGenre',
+            style = {'width':'40%'},
+            figure = {},
+    ),
+
+    html.H2("Select the year for viewing number of games based on genre in different years"),
     dcc.Dropdown(
                 id = 'ForPieChartOfGenreDistInDifferentYears',
                 options=dropdown_options_years,
@@ -82,6 +96,11 @@ app.layout = html.Div([
 
 # Callbacks Section:
 from callbacks import *
+
+# #include external css:
+# app.css.append_css(
+#     {"external_url":"https://codepen.io/chriddyp/pen/bWLwgP.css"}
+# )
 
 if __name__ == '__main__':
     app.run(debug=True)
